@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InternCheck — Internship Reality Check & Scam Detector</title>
+  <meta name="description" content="Validate internship postings and descriptions for common scam patterns, registration fees, and exploitative work instantly.">
+  
+  <!-- Tab Icon (Favicon) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="/src/style.css">
+  
+  <!-- PDF.js library for client-side resume parsing (V4) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  
+  <!-- Lucide Icons CDN (V7 Redesign) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-background-glow"></div>
+  
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area">
+        <span class="logo-shield">🛡️</span>
+        <div class="logo-text">
+          <h1>InternCheck</h1>
+          <p class="tagline">Know what you're applying for.</p>
+        </div>
+      </div>
+      <div class="app-badge">Reality Scanner</div>
+      <div id="auth-header-section" class="auth-header-section">
+        <button id="login-trigger-btn" class="auth-btn">Sign In / Register</button>
+      </div>
+    </header>
+
+    <main class="app-layout">
+      <!-- Input Panel -->
+      <section class="panel input-panel">
+        <div class="panel-header">
+          <h2>Analyze Listing</h2>
+          <p class="panel-subtitle">Paste the internship description below to run instant checks.</p>
+        </div>
+        
+        <div class="input-group" style="margin-bottom: 1rem;">
+          <label for="url-input" class="sr-only">Internship URL (Optional)</label>
+          <input 
+            type="url" 
+            id="url-input" 
+            placeholder="Paste the internship listing URL here (optional)..."
+            spellcheck="false"
+          />
+        </div>
+        
+        <div class="input-group">
+          <label for="description-input" class="sr-only">Internship Job Description</label>
+          <textarea 
+            id="description-input" 
+            placeholder="Paste the internship description, job requirements, or email text here..." 
+            spellcheck="false"
+          ></textarea>
+          
+          <button id="clear-btn" class="clear-btn" aria-label="Clear text" title="Clear text">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="templates-section">
+          <h3>Try a Demo Listing</h3>
+          <div class="template-buttons">
+            <button class="template-btn" data-template="legit">
+              🟢 Legitimate Dev Intern
+            </button>
+            <button class="template-btn" data-template="paid_training">
+              🔴 Course Purchase Scam
+            </button>
+            <button class="template-btn" data-template="fee_scam">
+              🔴 Registration Fee Scam
+            </button>
+            <button class="template-btn" data-template="whatsapp_task">
+              🟡 Telegram task Scam
+            </button>
+            <button class="template-btn" data-template="borderline">
+              🟡 Borderline / Caution Listing
+            </button>
+          </div>
+        </div>
+
+        <!-- Resume Upload Card (V4) -->
+        <div class="resume-upload-card" id="resume-upload-zone">
+          <div class="upload-icon">📄</div>
+          <div class="upload-text-group">
+            <span class="upload-title">Upload Resume (PDF only)</span>
+            <span class="upload-subtitle">Drag & drop or click to choose file</span>
+          </div>
+          <input type="file" id="resume-file-input" accept="application/pdf" style="display: none;" />
+        </div>
+
+        <div class="resume-status-card card hidden" id="resume-status-card">
+          <div class="resume-status-info">
+            <span class="resume-file-name" id="resume-file-name">my_resume.pdf</span>
+            <span class="resume-skills-badge" id="resume-skills-badge">0 Skills</span>
+          </div>
+          <button id="clear-resume-btn" class="clear-resume-btn" title="Remove Resume">&times;</button>
+        </div>
+
+        <button id="analyze-btn" class="primary-btn">
+          <span>Check Reality Score</span>
+          <svg class="btn-spinner" viewBox="0 0 50 50">
+            <circle cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Output Panel -->
+      <section class="panel output-panel" id="results-panel">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h2>Ready to Scan</h2>
+          <p>Paste an internship description on the left and click "Check Reality Score" to see its rating and flag analysis.</p>
+        </div>
+
+        <div class="results-layout hidden" id="results-content">
+          
+          <!-- Score summary -->
+          <div class="score-card card">
+            <div class="score-radial-wrapper">
+              <svg class="score-svg" viewBox="0 0 120 120">
+                <circle class="score-bg-circle" cx="60" cy="60" r="50"></circle>
+                <circle class="score-fill-circle" id="score-circle" cx="60" cy="60" r="50"></circle>
+              </svg>
+              <div class="score-text-overlay">
+                <span class="score-number" id="score-value">100</span>
+                <span class="score-max">/100</span>
+              </div>
+            </div>
+            
+            <div class="score-meta">
+              <div class="rating-badge-group">
+                <div class="rating-badge" id="rating-badge">Legitimate</div>
+                <div class="verified-badge hidden" id="verified-badge">✅ Verified Listing</div>
+              </div>
+              <p class="rating-subtext" id="rating-subtext">No major red flags detected.</p>
+              
+              <!-- Domain Age Fact (V5) -->
+              <div class="domain-age-badge hidden" id="domain-age-badge">
+                <span class="domain-age-icon">🌐</span>
+                <span class="domain-age-text" id="domain-age-text">Domain age: loading...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skill Match Card (V4) -->
+          <div class="skill-match-card card" id="skill-match-container">
+            <div class="skill-match-placeholder" id="skill-match-placeholder">
+              <span class="placeholder-icon">📋</span>
+              <p>Upload a resume on the left to see your Skill Match percentage and identify any Skill Gaps.</p>
+            </div>
+            
+            <div class="skill-match-details hidden" id="skill-match-details">
+              <div class="skill-match-score-section">
+                <div class="skill-match-percent" id="skill-match-value">0%</div>
+                <div class="skill-match-label">Skill Match Score</div>
+              </div>
+              
+              <div class="skills-comparison-grid">
+                <div class="skills-column">
+                  <h4>Matched Skills</h4>
+                  <div class="skills-list-badges" id="matched-skills-badges">
+                    <!-- Badges for matched skills -->
+                  </div>
+                </div>
+                <div class="skills-column">
+                  <h4>Skill Gaps (Missing)</h4>
+                  <div class="skills-list-badges" id="gap-skills-badges">
+                    <!-- Badges for missing skills -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mode Toggles & Flags List -->
+          <div class="flags-card card">
+            <div class="flags-card-header">
+              <div class="flags-title-group">
+                <h3>Detected Risks</h3>
+                <span class="flag-counter" id="flag-counter">0 Flags</span>
+              </div>
+              <div class="toggle-wrapper">
+                <span class="toggle-label">Explain like I'm new</span>
+                <label class="switch-container">
+                  <input type="checkbox" id="explain-mode-toggle">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flags-list" id="flags-list">
+              <!-- Flag items injected here -->
+            </div>
+          </div>
+
+          <!-- Action plan / Advice -->
+          <div class="advice-card card">
+            <div class="advice-icon" id="advice-icon">🛡️</div>
+            <div class="advice-content">
+              <h3>Action Plan</h3>
+              <p id="advice-text">Review the listing details. If everything looks standard, proceed with normal job application precautions.</p>
+            </div>
+          </div>
+
+          <!-- Community Reports Card -->
+          <div class="reports-card card" id="reports-card">
+            <div class="reports-card-header">
+              <div class="reports-title-group">
+                <h3>Community Reports</h3>
+                <span class="reports-count-badge" id="reports-count-badge">0 Reports</span>
+              </div>
+            </div>
+            
+            <div class="reports-summary-box hidden" id="reports-summary-box"></div>
+
+            <div class="reports-list" id="reports-list">
+              <!-- Dynamically injected reports -->
+            </div>
+
+            <div class="new-report-section" id="new-report-section">
+              <!-- Dynamically injected report form or auth prompt -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p class="disclaimer">
+        <strong>Disclaimer:</strong> InternCheck is an independent helper tool. Reality Scores are generated using automated matches, domain checks, and community reports, and are for informational purposes only. Always perform your own due diligence.
+      </p>
+    </footer>
+  </div>
+
+  <div class="auth-modal-overlay hidden" id="auth-modal">
+    <div class="auth-modal-content">
+      <button class="modal-close-btn" id="close-auth-btn" aria-label="Close authentication modal">&times;</button>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tab-login-btn">Login</button>
+        <button class="auth-tab-btn" id="tab-signup-btn">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" required placeholder="Enter your email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="Enter your password" />
+        </div>
+        <div class="form-error" id="login-error"></div>
+        <button type="submit" class="primary-btn">Login</button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signup-form" class="auth-form hidden">
+        <div class="form-group">
+          <label for="signup-name">Full Name</label>
+          <input type="text" id="signup-name" required placeholder="Enter your name" />
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" required placeholder="Enter your email" />
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" required placeholder="Enter your password" />
+        </div>
+        <div class="form-error" id="signup-error"></div>
+        <button type="submit" class="primary-btn">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+  
+  <!-- Automatic Lucide Icon Parser (V7 Redesign) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Parse static icons
+      lucide.createIcons();
+      
+      // Setup dynamic parser for list items/badges inserted asynchronously
+      const observer = new MutationObserver(() => {
+        lucide.createIcons();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+  </script>
+</body>
+</html>

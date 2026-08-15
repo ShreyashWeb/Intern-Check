@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InternCheck — Internship Reality Check & Scam Detector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area">
+        <span class="logo-shield">🛡️</span>
+        <div class="logo-text">
+          <h1>InternCheck</h1>
+          <p class="tagline">Know what you're applying for.</p>
+        </div>
+      </div>
+      <div class="app-badge">V2 Extension</div>
+    </header>
+
+    <main>
+      <!-- Initial State Panel -->
+      <section id="initial-panel" class="panel initial-state">
+        <div class="initial-icon">🔍</div>
+        <h2>Ready to Check</h2>
+        <p>Open any internship listing page (e.g., LinkedIn or Internshala) and click the button below to scan for scams and hidden charges.</p>
+        <button id="check-btn" class="primary-btn">
+          <span>Check Internship</span>
+        </button>
+      </section>
+
+      <!-- Loading State Panel -->
+      <section id="loading-panel" class="panel loading-state hidden">
+        <div class="scanner-ring"></div>
+        <p id="loading-text">Extracting page content...</p>
+      </section>
+
+      <!-- Results Panel -->
+      <section id="results-panel" class="panel results-container hidden">
+        
+        <!-- Score Card -->
+        <div class="score-card card">
+          <div class="score-circle-wrapper">
+            <svg class="score-svg" viewBox="0 0 100 100">
+              <circle class="score-bg-circle" cx="50" cy="50" r="40"></circle>
+              <circle class="score-fill-circle" id="score-circle" cx="50" cy="50" r="40"></circle>
+            </svg>
+            <div class="score-text-overlay">
+              <span class="score-number" id="score-value">100</span>
+              <span class="score-max">/100</span>
+            </div>
+          </div>
+          <div class="score-meta">
+            <div class="rating-badge" id="rating-badge">Legitimate</div>
+            <p class="rating-subtext" id="rating-subtext">No major red flags detected.</p>
+            <span class="source-tag" id="source-tag">Source: tab title</span>
+          </div>
+        </div>
+
+        <!-- Risks List Card -->
+        <div class="flags-card card">
+          <div class="flags-card-header">
+            <div class="flags-title-group">
+              <h3>Detected Risks</h3>
+              <span class="flag-counter" id="flag-counter">0 Flags</span>
+            </div>
+            <div class="toggle-wrapper">
+              <span class="toggle-label">Explain like I'm new</span>
+              <label class="switch-container">
+                <input type="checkbox" id="explain-mode-toggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="flags-list" id="flags-list">
+            <!-- Dynamically injected flag elements -->
+          </div>
+        </div>
+
+        <!-- Advice/Action Plan Card -->
+        <div class="advice-card card" id="advice-card">
+          <div class="advice-icon" id="advice-icon">🛡️</div>
+          <div class="advice-content">
+            <h3>Action Plan</h3>
+            <p id="advice-text">Review the listing details. If everything looks standard, proceed with normal job application precautions.</p>
+          </div>
+        </div>
+
+        <!-- Debug Card to show extracted text preview -->
+        <div class="card" style="border: 1px dashed var(--color-purple); background: rgba(168, 85, 247, 0.05); padding: 0.65rem;">
+          <h4 style="font-size: 0.7rem; color: #c084fc; margin-bottom: 0.25rem; font-weight: 700;">[Debug] Extracted Text Preview</h4>
+          <p id="debug-text-preview" style="font-size: 0.65rem; color: var(--text-secondary); font-family: var(--font-sans); line-height: 1.35; white-space: pre-wrap; word-break: break-all; max-height: 50px; overflow-y: auto;"></p>
+        </div>
+
+        <button id="reset-btn" class="secondary-btn">Scan Another Page</button>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p class="disclaimer">
+        <strong>Disclaimer:</strong> InternCheck Reality Scores are generated using automated pattern matches for common internship red flags. This is a V2 Extension and is for informational purposes only.
+      </p>
+    </footer>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

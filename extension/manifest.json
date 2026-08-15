@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "InternCheck",
+  "version": "2.0.0",
+  "description": "Checks internship postings for common scam patterns, registration fees, and exploitative work.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
