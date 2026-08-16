@@ -698,7 +698,7 @@ function renderReportFormSection() {
   newReportSection.innerHTML = `
     <h4>Submit a Community Report</h4>
     <form id="new-report-form" class="auth-form">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="report-form-grid">
         <div class="form-group">
           <label for="report-company">Company Name</label>
           <input type="text" id="report-company" required value="${escapeHTML(guesses.company)}" />
