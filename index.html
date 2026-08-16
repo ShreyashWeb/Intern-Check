@@ -303,7 +303,13 @@
       
       // Setup dynamic parser for list items/badges inserted asynchronously
       const observer = new MutationObserver(() => {
-        lucide.createIcons();
+        // Only run if there is at least one unprocessed icon in the DOM
+        const unprocessedIcons = document.querySelectorAll('i[data-lucide], [data-lucide]:not(svg)');
+        if (unprocessedIcons.length > 0) {
+          observer.disconnect();
+          lucide.createIcons();
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
       });
       observer.observe(document.body, { childList: true, subtree: true });
     });
